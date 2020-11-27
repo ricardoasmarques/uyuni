@@ -1,3 +1,4 @@
+- Fix configuration file download links to actually download files instead of redirecting to the home page (bsc#1179324)
 - fix expanded support detection based on CentOS installations (bsc#1179589)
 - add translation strings for newly added countries and timezones (jsc#PM-2081)
 - Fix the activation key handling from kickstart profile (bsc#1178647)
