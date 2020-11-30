@@ -1,3 +1,4 @@
+- Ensure deleted systems are not re-added after reboot
 - Added RHEL support.
 
 -------------------------------------------------------------------

@@ -20,3 +20,6 @@ mgrchannels_repo_clean_keyring:
   file.absent:
     - name: /usr/share/keyrings/mgr-archive-keyring.gpg
 {%- endif %}
+
+/etc/salt/minion.d/susemanager.conf:
+  file.absent
