@@ -1,3 +1,4 @@
+- Removed "Software Crashes" feature
 - Changed to versioned Python3 to SPEC file.
 - Python3 port for blend tool
 - add missing unique index on suse tables

@@ -14,8 +14,6 @@
  */
 package com.redhat.rhn.domain.server;
 
-import static java.util.stream.Collectors.toMap;
-
 import com.redhat.rhn.common.client.ClientCertificate;
 import com.redhat.rhn.common.client.InvalidCertificateException;
 import com.redhat.rhn.common.db.datasource.CallableMode;
@@ -33,15 +31,12 @@ import com.redhat.rhn.domain.org.Org;
 import com.redhat.rhn.domain.rhnpackage.PackageEvrFactory;
 import com.redhat.rhn.domain.user.User;
 import com.redhat.rhn.frontend.dto.HistoryEvent;
-import com.redhat.rhn.frontend.dto.SoftwareCrashDto;
 import com.redhat.rhn.frontend.xmlrpc.ChannelSubscriptionException;
 import com.redhat.rhn.frontend.xmlrpc.ServerNotInGroupException;
 import com.redhat.rhn.manager.entitlement.EntitlementManager;
 import com.redhat.rhn.manager.rhnset.RhnSetDecl;
 import com.redhat.rhn.manager.system.UpdateBaseChannelCommand;
-
 import com.suse.manager.model.maintenance.MaintenanceSchedule;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
@@ -52,6 +47,11 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -66,11 +66,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Root;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * ServerFactory - the singleton class used to fetch and store
@@ -1192,20 +1188,6 @@ public class ServerFactory extends HibernateFactory {
                 // Do not use setCacheable(true), as tag deletion will
                 // usually end up making this query's output out of date
                 .uniqueResult();
-    }
-
-    /**
-     * Lists software crashes for a server
-     * @param server of interest
-     * @return crash list
-     */
-    public static List<SoftwareCrashDto> listServerSoftwareCrashes(Server server) {
-        SelectMode m = ModeFactory.getMode("System_queries",
-                "list_server_software_crashes");
-        Map<String, Object> params = new HashMap<String, Object>();
-        // params.put("org_id", user.getOrg().getId());
-        params.put("server_id", server.getId());
-        return m.execute(params);
     }
 
     /**
