@@ -365,19 +365,31 @@ where rhnserverprofilepackage.server_profile_id = sub.server_profile_id and
 
 
 --    TABLE "rhnservercrash" CONSTRAINT "rhn_server_crash_evr_id_fk" FOREIGN KEY (package_evr_id) REFERENCES rhnpackageevr(id)
-with sub as (
-    select p.server_id, p.crash, t.label, pe.evr
-         from rhnservercrash p
-         join rhnpackagearch pa on p.package_arch_id = pa.id
-         join rhnarchtype t on pa.arch_type_id = t.id
-         join rhnpackageevr pe on p.package_evr_id = pe.id
-)
-update rhnservercrash
-set package_evr_id = lookup_evr((sub.evr).epoch, (sub.evr).version, (sub.evr).release, sub.label)
-from sub
-where rhnservercrash.server_id = sub.server_id and
-      rhnservercrash.crash = sub.crash;
-
+DO $$
+    BEGIN
+      -- Schema migration should be idempotent, so we need to guarantee that it will not fail
+      -- if 'rhnservercrash' table was already dropped by the '801-drop-servercrash.sql' script
+      IF EXISTS (
+            SELECT 1
+                from information_schema.tables
+                where table_schema = current_schema()
+                and table_name = 'rhnservercrash'
+      ) THEN
+        with sub as (
+            select p.server_id, p.crash, t.label, pe.evr
+                 from rhnservercrash p
+                 join rhnpackagearch pa on p.package_arch_id = pa.id
+                 join rhnarchtype t on pa.arch_type_id = t.id
+                 join rhnpackageevr pe on p.package_evr_id = pe.id
+        )
+        update rhnservercrash
+        set package_evr_id = lookup_evr((sub.evr).epoch, (sub.evr).version, (sub.evr).release, sub.label)
+        from sub
+        where rhnservercrash.server_id = sub.server_id and
+              rhnservercrash.crash = sub.crash;
+      END IF ;
+    END
+$$ ;
 
 --    TABLE "rhnlockedpackages" CONSTRAINT "rhnlockedpackages_evr_id_fkey" FOREIGN KEY (evr_id) REFERENCES rhnpackageevr(id)
 with sub as (
