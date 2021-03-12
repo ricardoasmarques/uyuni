@@ -26,6 +26,7 @@ import com.redhat.rhn.domain.action.script.ScriptResult;
 import com.redhat.rhn.domain.action.script.ScriptRunAction;
 import com.redhat.rhn.domain.channel.Channel;
 import com.redhat.rhn.domain.channel.ChannelFactory;
+import com.redhat.rhn.domain.channel.Comps;
 import com.redhat.rhn.domain.channel.MediaProducts;
 import com.redhat.rhn.domain.common.CommonFactory;
 import com.redhat.rhn.domain.common.TinyUrl;
@@ -659,8 +660,12 @@ public class DownloadFile extends DownloadAction {
                 }
             }
             else if (path.endsWith("/comps.xml")) {
+                Comps comps = child.getComps();
+                if (comps == null) {
+                    throw new IllegalStateException("Channel '" + child.getLabel() + "' has no comps.");
+                }
                 diskPath = Config.get().getString(ConfigDefaults.MOUNT_POINT) +
-                    "/" + child.getComps().getRelativeFilename();
+                    "/" + comps.getRelativeFilename();
             }
             else if (path.endsWith("/modules.yaml")) {
                 diskPath = Config.get().getString(ConfigDefaults.MOUNT_POINT) +
